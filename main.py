@@ -14,6 +14,7 @@ app = Flask(__name__)
 @app.route('/')
 def index():
     return render_template('index.html')
+    # return render_template('index.html')
 
 
 @app.route('/search')
@@ -35,14 +36,16 @@ def search():
             }
         }
     }
-
     res = es.search(index='lyrics', body=body)
-    hits = [{'title': doc['_source']['title'], 'lyrics': doc['_source']['lyrics'] 
-             , 'image_url': doc['_source']['image_url']}
+    hits = [{'title': doc['_source']['title'],
+            'lyrics': (doc['_source']['lyrics'][:500] + "...." if len(doc['_source']['lyrics']) > 500 else doc['_source']['lyrics']),
+              'image_url': doc['_source']['image_url']}
             for doc in res['hits']['hits']]
     page_total = math.ceil(res['hits']['total']['value']/page_size)
     return render_template('search.html', keyword=keyword, hits=hits, page_no=page_no, page_total=page_total)
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
+    # app.run()
+

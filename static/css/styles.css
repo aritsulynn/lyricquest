@@ -1,0 +1,25 @@
+ul {
+  list-style: none;
+}
+
+ul li {
+  display: inline;
+}
+
+ul li a,
+ul li {
+  text-decoration: none;
+  color: #fff;
+  /* margin-left: 50px;
+  margin-right: 50px; */
+  font-size: 18px;
+}
+
+ul li a:hover {
+  color: black;
+}
+
+.navtools {
+  margin-top: 25px;
+  margin-bottom: 25px;
+}
