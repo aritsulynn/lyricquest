@@ -1,5 +1,12 @@
-ul {
-  list-style: none;
+* {
+  font-family: "Courier New", Courier, monospace;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.search-container {
+  margin-top: 3.33%;
 }
 
 ul li {
@@ -22,4 +29,102 @@ ul li a:hover {
 .navtools {
   margin-top: 25px;
   margin-bottom: 25px;
+}
+
+.song-title {
+  color: #f1c40f; /* Gold color for titles to make them pop */
+  padding-bottom: 10px;
+}
+
+.lyrics {
+  font-size: 1.1em;
+  color: #ecf0f1; /* Light color for contrast */
+  line-height: 1.5;
+}
+
+.img-fluid {
+  max-height: 400px;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.row.no-gutters {
+  margin-right: 0;
+  margin-left: 0;
+}
+
+.row.no-gutters > [class^="col-"] {
+  padding-right: 0;
+  padding-left: 0;
+}
+
+.pr-2 {
+  padding-right: 0.5rem;
+}
+
+.pl-2 {
+  padding-left: 0.5rem;
+}
+
+form {
+  position: relative;
+}
+
+form svg {
+  top: 15px;
+  left: 15px;
+  position: absolute;
+}
+/* .suggestion-box div {
+  cursor: pointer;
+ 
+  padding: 10px;
+  border-bottom: 1px solid #d4d4d4;
+  color: #010101;
+}
+*/
+
+.suggestion-box {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  z-index: 1;
+  width: 100%;
+  display: none;
+  /* border: 1px solid #ccc; */
+  background: #fff;
+}
+
+.suggestion-box a {
+  text-decoration: none;
+  color: black;
+}
+
+.suggestion-box div {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.suggestion-box div:hover {
+  background-color: #252525;
+  color: #ffffff;
+}
+
+#search-input {
+  padding: 10px;
+  /* border: 1px solid #ccc; */
+  outline: none;
+  font-size: 16px;
+  transition: border-color 0.3s ease-in-out;
+  background-color: #fff;
+  border-radius: 25px;
+  text-indent: 33px;
+}
+
+#search-input:focus {
+  border-color: #010101;
+  /* border-radius: 0; */
+  border-radius: 15px 15px 0px 0px;
+  background-color: ghostwhite;
 }

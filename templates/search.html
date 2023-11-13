@@ -1,44 +1,150 @@
-{% extends "layout.html" %} {% block content %}
+{% extends "layout.html" %}
+{% block content %}
 <div class="container">
+
+  <div style="padding-bottom: 20px">
+    <div class="search-container">
+      <form
+        class="form-inline my-2 my-lg-0"
+        method="GET"
+        action="{{ url_for('search') }}"
+      >
+        <input
+          id="search-input"
+          class="form-control mr-sm-2"
+          type="search"
+          name="keyword"
+          placeholder="Search Lyrics & more"
+          aria-label="Search"
+          oninput="showSuggestions(this.value)"
+          autocomplete="off"
+          value="{{ keyword }}"
+        />
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="1em"
+          viewBox="0 0 512 512"
+        >
+          <path
+            d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"
+          />
+        </svg>
+        <div id="suggestion-box" class="suggestion-box"></div>
+      </form>
+    </div>
+  </div>
+
   <div style="color: #fff;">
     {% for doc in hits %}
     <div style="display: flex; align-items: center; margin-bottom: 10px;">
       <img src="{{ doc['image_url'] }}" width="250px" style="margin-right: 20px;">
       <div>
-        <h1><a href="/{{doc['title']}}">{{ doc['title'] }}</a></h1>
+        <h1><a href="/song/{{doc['id']}}">{{ doc['title'] }}</a></h1>
         <p>{{ doc['lyrics'] }}</p>
       </div>
     </div>
     <hr>
     {% endfor %}
   </div>
-  
 
-
-<nav aria-label="Page navigation" style="margin-top: 15px;">
-  <ul class="pagination justify-content-center">
-      {% if page_no!=1 %}
-      <li class="page-item"><a class="page-link" href="?keyword={{ keyword }}&page=1">First</a></li>
-      <li class="page-item">
-          <a class="page-link" href="?keyword={{ keyword }}&page={{ page_no-1 }}" aria-label="Previous">
-          <span aria-hidden="true">&laquo;</span>
-          </a>
-      </li>
-      <li class="page-item"><a class="page-link" href="?keyword={{ keyword }}&page={{ page_no-1 }}">{{ page_no-1 }}</a></li> 
-      {% endif %}
-      {% if page_total!=1 %}
-      <li class="page-item active"><a class="page-link " href="#">{{ page_no }}</a></li>
-      {% endif %}
-      {% if page_no<page_total %}
-      <li class="page-item"><a class="page-link" href="?keyword={{ keyword }}&page={{ page_no+1 }}">{{ page_no+1 }}</a></li>
-      <li class="page-item">
-          <a class="page-link" href="?keyword={{ keyword }}&page={{ page_no+1 }}" aria-label="Next">
-          <span aria-hidden="true">&raquo;</span>
-          </a>
-      </li>
-      <li class="page-item"><a class="page-link" href="?keyword={{ keyword }}&page={{ page_total }}">Last</a></li>
-      {% endif %}
-  </ul>
-</nav>
+  <nav aria-label="Page navigation" style="margin-top: 15px;">
+    <ul class="pagination justify-content-center">
+        {% if page_no!=1 %}
+        <li class="page-item"><a class="page-link" href="?keyword={{ keyword }}&page=1">First</a></li>
+        <li class="page-item">
+            <a class="page-link" href="?keyword={{ keyword }}&page={{ page_no-1 }}" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        <li class="page-item"><a class="page-link" href="?keyword={{ keyword }}&page={{ page_no-1 }}">{{ page_no-1 }}</a></li> 
+        {% endif %}
+        {% if page_total!=1 %}
+        <li class="page-item active"><a class="page-link " href="#">{{ page_no }}</a></li>
+        {% endif %}
+        {% if page_no<page_total%}
+        <li class="page-item"><a class="page-link" href="?keyword={{ keyword }}&page={{ page_no+1 }}">{{ page_no+1 }}</a></li>
+        <li class="page-item">
+            <a class="page-link" href="?keyword={{ keyword }}&page={{ page_no+1 }}" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+        <li class="page-item"><a class="page-link" href="?keyword={{ keyword }}&page={{ page_total }}">Last</a></li>
+        {% endif %}
+    </ul>
+  </nav>
 </div>
+
+
+<script>
+  function showSuggestions(value) {
+    if (value.length < 1) {
+      document.getElementById("suggestion-box").style.display = "none";
+      return;
+    }
+
+    fetch(`/autocomplete?q=${encodeURIComponent(value)}`)
+      .then((response) => response.json())
+      .then((suggestions) => {
+        const suggestionBox = document.getElementById("suggestion-box");
+        const regex = new RegExp(`(${value})`, "gi");
+
+        suggestionBox.innerHTML = suggestions
+          .map(
+            (suggestion) =>
+              `<a href="/song/${suggestion.id}">
+                  <div>
+                    <img src="${
+                      suggestion.image_url
+                    }" alt="" style="width: 50px" />
+                    ${suggestion.title.replace(regex, "<strong>$1</strong>")}
+                    <p>${highlightMatchedWord(suggestion.lyrics, value)}</p>
+                  </div>
+                 
+                </a>`
+          )
+          .join("");
+
+        // Show or hide suggestions based on whether there are matches
+        suggestions.length > 0
+          ? (suggestionBox.style.display = "block")
+          : (suggestionBox.style.display = "none");
+      })
+      .catch((error) => console.error("Error:", error));
+  }
+
+  // Function to highlight matched word in lyrics with limited characters
+  function highlightMatchedWord(lyrics, value) {
+    const maxChars = 100; // Set your desired maximum characters
+    const regex = new RegExp(`(${value})`, "gi");
+    const matchedIndex = lyrics.toLowerCase().indexOf(value.toLowerCase());
+
+    let startIndex = Math.max(0, matchedIndex - maxChars / 2);
+    let endIndex = Math.min(startIndex + maxChars, lyrics.length);
+
+    if (startIndex !== 0) {
+      startIndex = lyrics.indexOf(" ", startIndex) + 1;
+    }
+
+    if (endIndex !== lyrics.length) {
+      endIndex = lyrics.lastIndexOf(" ", endIndex);
+      if (endIndex === -1) {
+        endIndex = lyrics.length;
+      }
+    }
+
+    const matchedText = lyrics.substring(startIndex, endIndex);
+
+    return startIndex > 0 ? `...${matchedText}...` : matchedText;
+  }
+
+  // Event listener to hide suggestions on document click
+  document.addEventListener("click", function (event) {
+    if (!event.target.closest(".search-container")) {
+      document.getElementById("suggestion-box").style.display = "none";
+    } else if (event.target.closest(".search-container")) {
+      document.getElementById("suggestion-box").style.display = "block";
+    }
+  });
+</script>
+
 {% endblock %}

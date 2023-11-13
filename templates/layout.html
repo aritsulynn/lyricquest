@@ -9,7 +9,12 @@
       integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
       crossorigin="anonymous"
     />
-    <link rel="stylesheet" href="./static/css/styles.css" />
+    <!-- <link rel="stylesheet" href="./static/css/styles.css" /> -->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='css/styles.css') }}"
+    />
     <!-- <img
                   class="img-fluid col-md-6 offset-md-3"
                   src="./static/img/gs.png"
@@ -17,37 +22,13 @@
                 /> -->
   </head>
   <body style="background-color: #353535">
-    <div style="background-color: #222222">
-      <div class="container">
-        <nav class="navbar navbar-dark">
-          <a class="navbar-brand" href="/">LyricQuest</a>
-          <div>
-            <form
-              class="form-inline my-2 my-lg-0"
-              method="GET"
-              action="{{ url_for('search') }}"
-            >
-              <input
-                class="form-control mr-sm-2"
-                type="search"
-                name="keyword"
-                placeholder="Search Lyrics & more"
-                aria-label="Search"
-              />
-            </form>
-          </div>
-        </nav>
-      </div>
-    </div>
     <div class="container text-center navtools">
       <ul class="d-flex justify-content-evenly">
         <li><a href="/">HOME</a></li>
         <li>|</li>
-        <li><a href="/">NEW</a></li>
+        <li><a href="/top">Top Song</a></li>
         <li>|</li>
-        <li><a href="/">CHARTS</a></li>
-        <li>|</li>
-        <li><a href="/">ARTISTS</a></li>
+        <li><a href="/random">Random Song</a></li>
       </ul>
     </div>
     <main>{% block content %} {% endblock %}</main>

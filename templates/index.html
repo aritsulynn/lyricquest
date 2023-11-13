@@ -1,15 +1,153 @@
 {% extends "layout.html" %} {% block content %}
 
-<div class="container bg-dark">
-  <div style="color: #fff">
-    <div class="text-center" style="padding-top: 20px; padding-bottom: 20px">
-      <h1>App Directory</h1>
-      {% for letter in 'abcdefghijklmnopqrstuvwxyz' %}
-      <a href="/search?keyword={{ letter }}" class="btn btn-primary"
-        >{{ letter }}</a
+<div class="container">
+  <div style="padding-top: 20px; padding-bottom: 20px">
+    <h1 class="text-center" style="color: white">LyricQuest</h1>
+    <div class="search-container">
+      <form
+        class="form-inline my-2 my-lg-0"
+        method="GET"
+        action="{{ url_for('search') }}"
       >
-      {% endfor %}
+        <input
+          id="search-input"
+          class="form-control mr-sm-2"
+          type="search"
+          name="keyword"
+          placeholder="Search Lyrics & more"
+          aria-label="Search"
+          oninput="showSuggestions(this.value)"
+          autocomplete="off"
+        />
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="1em"
+          viewBox="0 0 512 512"
+        >
+          <path
+            d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"
+          />
+        </svg>
+        <div id="suggestion-box" class="suggestion-box"></div>
+      </form>
     </div>
   </div>
 </div>
+
+<script>
+  function showSuggestions(value) {
+    if (value.length < 1) {
+      document.getElementById("suggestion-box").style.display = "none";
+      return;
+    }
+
+    fetch(`/autocomplete?q=${encodeURIComponent(value)}`)
+      .then((response) => response.json())
+      .then((suggestions) => {
+        const suggestionBox = document.getElementById("suggestion-box");
+        const regex = new RegExp(`(${value})`, "gi");
+
+        suggestionBox.innerHTML = suggestions
+          .map(
+            (suggestion) =>
+              `<a href="/song/${suggestion.id}">
+                  <div>
+                    <img src="${
+                      suggestion.image_url
+                    }" alt="" style="width: 50px" />
+                    ${suggestion.title.replace(regex, "<strong>$1</strong>")}
+                    <p>${highlightMatchedWord(suggestion.lyrics, value)}</p>
+                  </div>
+                 
+                </a>`
+          )
+          .join("");
+
+        // Show or hide suggestions based on whether there are matches
+        suggestions.length > 0
+          ? (suggestionBox.style.display = "block")
+          : (suggestionBox.style.display = "none");
+      })
+      .catch((error) => console.error("Error:", error));
+  }
+
+  // Function to highlight matched word in lyrics with limited characters
+  function highlightMatchedWord(lyrics, value) {
+    const maxChars = 100; // Set your desired maximum characters
+    const regex = new RegExp(`(${value})`, "gi");
+    const matchedIndex = lyrics.toLowerCase().indexOf(value.toLowerCase());
+
+    let startIndex = Math.max(0, matchedIndex - maxChars / 2);
+    let endIndex = Math.min(startIndex + maxChars, lyrics.length);
+
+    if (startIndex !== 0) {
+      startIndex = lyrics.indexOf(" ", startIndex) + 1;
+    }
+
+    if (endIndex !== lyrics.length) {
+      endIndex = lyrics.lastIndexOf(" ", endIndex);
+      if (endIndex === -1) {
+        endIndex = lyrics.length;
+      }
+    }
+
+    const matchedText = lyrics.substring(startIndex, endIndex);
+
+    return startIndex > 0 ? `...${matchedText}...` : matchedText;
+  }
+
+  // Event listener to hide suggestions on document click
+  document.addEventListener("click", function (event) {
+    if (!event.target.closest(".search-container")) {
+      document.getElementById("suggestion-box").style.display = "none";
+    } else if (event.target.closest(".search-container")) {
+      document.getElementById("suggestion-box").style.display = "block";
+    }
+  });
+</script>
+
 {% endblock %}
+
+<!-- <script>
+  function showSuggestions(value) {
+    if (value.length < 1) {
+      document.getElementById("suggestion-box").style.display = "none";
+      return;
+    }
+
+    fetch(`/autocomplete?q=${encodeURIComponent(value)}`)
+      .then((response) => response.json())
+      .then((suggestions) => {
+        const suggestionBox = document.getElementById("suggestion-box");
+        const regex = new RegExp(`(${value})`, "gi");
+
+        suggestionBox.innerHTML = suggestions
+          .map(
+            (suggestion) =>
+              `<a href="/song/${suggestion.id}">
+                  <div>
+                    <img src="${
+                      suggestion.image_url
+                    }" alt="" style="width: 50px" />
+                    ${suggestion.title.replace(regex, "<strong>$1</strong>")}
+                  </div>
+                  <p>${suggestion.lyrics}</p>
+                </a>`
+          )
+          .join("");
+
+        // Show or hide suggestions based on whether there are matches
+        suggestions.length > 0
+          ? (suggestionBox.style.display = "block")
+          : (suggestionBox.style.display = "none");
+      })
+      .catch((error) => console.error("Error:", error));
+  }
+
+  // Event listener to hide suggestions on document click
+  document.addEventListener("click", function (event) {
+    if (!event.target.closest(".search-container")) {
+      document.getElementById("suggestion-box").style.display = "none";
+    }
+  });
+</script> -->
