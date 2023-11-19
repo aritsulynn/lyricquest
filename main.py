@@ -38,6 +38,7 @@ def search():
     }
     res = es.search(index='lyrics', body=body)
     hits = [{'title': doc['_source']['title'],
+             '_score': doc['_score'],
             'lyrics': (doc['_source']['lyrics'][:500] + "...." if len(doc['_source']['lyrics']) > 500 else doc['_source']['lyrics']), 'id': doc['_source']['id'],
               'image_url': doc['_source']['image_url']}
             for doc in res['hits']['hits']]
@@ -59,6 +60,7 @@ def song(song_id):
 
     for doc in res['hits']['hits']:
         hits = {'title': doc['_source']['title'],
+                '_score': doc['_score'],
                 'lyrics': doc['_source']['lyrics'],
                 'image_url': doc['_source']['image_url']}
     

@@ -73,7 +73,7 @@
 
   // Function to highlight matched word in lyrics with limited characters
   function highlightMatchedWord(lyrics, value) {
-    const maxChars = 100; // Set your desired maximum characters
+    const maxChars = 100;
     const regex = new RegExp(`(${value})`, "gi");
     const matchedIndex = lyrics.toLowerCase().indexOf(value.toLowerCase());
 
@@ -107,47 +107,3 @@
 </script>
 
 {% endblock %}
-
-<!-- <script>
-  function showSuggestions(value) {
-    if (value.length < 1) {
-      document.getElementById("suggestion-box").style.display = "none";
-      return;
-    }
-
-    fetch(`/autocomplete?q=${encodeURIComponent(value)}`)
-      .then((response) => response.json())
-      .then((suggestions) => {
-        const suggestionBox = document.getElementById("suggestion-box");
-        const regex = new RegExp(`(${value})`, "gi");
-
-        suggestionBox.innerHTML = suggestions
-          .map(
-            (suggestion) =>
-              `<a href="/song/${suggestion.id}">
-                  <div>
-                    <img src="${
-                      suggestion.image_url
-                    }" alt="" style="width: 50px" />
-                    ${suggestion.title.replace(regex, "<strong>$1</strong>")}
-                  </div>
-                  <p>${suggestion.lyrics}</p>
-                </a>`
-          )
-          .join("");
-
-        // Show or hide suggestions based on whether there are matches
-        suggestions.length > 0
-          ? (suggestionBox.style.display = "block")
-          : (suggestionBox.style.display = "none");
-      })
-      .catch((error) => console.error("Error:", error));
-  }
-
-  // Event listener to hide suggestions on document click
-  document.addEventListener("click", function (event) {
-    if (!event.target.closest(".search-container")) {
-      document.getElementById("suggestion-box").style.display = "none";
-    }
-  });
-</script> -->
