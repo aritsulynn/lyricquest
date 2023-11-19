@@ -5,8 +5,8 @@ import ndjson
 import argparse
 import uuid
 import csv
-
-es = Elasticsearch( "https://localhost:9200", basic_auth=("elastic", "262545"), verify_certs=False)
+ELASTIC_PASSWORD = "1234" # Change this to your own password here
+es = Elasticsearch( "https://localhost:9200", basic_auth=("elastic", ELASTIC_PASSWORD), verify_certs=False)
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--file', help='Path to the .csv file', required=True)
