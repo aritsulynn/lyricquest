@@ -5,7 +5,7 @@ import ndjson
 import argparse
 import uuid
 import csv
-ELASTIC_PASSWORD = "1234" # Change this to your own password here
+ELASTIC_PASSWORD = "123456" # Change this to your own password here
 es = Elasticsearch( "https://localhost:9200", basic_auth=("elastic", ELASTIC_PASSWORD), verify_certs=False)
 
 parser = argparse.ArgumentParser()
@@ -35,10 +35,11 @@ def setting():
         "settings": {
             "index": {
                 "similarity": {
-                    "default": {
-                        "type": "BM25",
-                        "b": 0.75,
-                        "k1": 1.2
+                    "scripted_tfidf": {
+                        "type": "scripted",
+                        "script": {
+                        "source": "double tf = Math.sqrt(doc.freq); double idf = Math.log((field.docCount+1.0)/(term.docFreq+1.0)) + 1.0; double norm = 1/Math.sqrt(doc.length); return query.boost * tf * idf * norm;"
+                        }
                     }
                 },
                 "analysis": {
